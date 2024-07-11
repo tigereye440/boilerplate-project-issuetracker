@@ -26,10 +26,10 @@ module.exports = function (app) {
           }
         });
         
-        res.json(result);
+        return res.json(result);
       } catch (err) {
         console.error(err);
-        res.status(500).json('Internal Server Error');
+        return res.status(500).json('Internal Server Error');
       }
 
     })
@@ -38,8 +38,18 @@ module.exports = function (app) {
       try {
         let project = req.params.project;
         const { issue_title, issue_text, created_by, assigned_to, status_text } = req.body;
-        if (issue_text === '' || issue_title === '' || created_by === '') {
-          return res.json('missing required field(s)');
+        if ((
+          issue_text === '' || 
+          issue_title === '' || 
+          created_by === ''
+          ) 
+          || 
+          (
+            !issue_text ||
+            !issue_title ||
+            !created_by
+          )) {
+          return res.json({ error: 'required field(s) missing'});
         }
         
         const savedIssue = await db.createNewIssue(project, issue_title, issue_text, created_by, assigned_to, status_text);
@@ -61,7 +71,7 @@ module.exports = function (app) {
         });
       } catch (err) {
         console.log(err);
-        res.status(401).json('Invalid field value');
+        return res.status(403).json({ error: 'could not update', _id: _id });
       }
       
     })
@@ -70,25 +80,33 @@ module.exports = function (app) {
       try {
         let project = req.params.project;
         let updateValues = req.body;
-        const _id = req.body._id
+        const _id = req.body._id;
+        let fieldsToUpdate = 0;
 
-        if (_id === '') {
-          return res.json('_id field cannot be empty');
+        if (_id === '' || !_id) {
+          return res.json({ error: 'missing _id'});
         }
 
         for (const key in updateValues) {
-          if (updateValues[key] === '') {
+          
+          if (key !== '_id' && updateValues[key] === '') {
+            fieldsToUpdate++;
             delete updateValues[key];
           }
+        }
+        
+
+        if (fieldsToUpdate === 5 || Object.keys(updateValues).length === 1) {
+          return res.json({ error: 'no update field(s) sent', _id: _id })
         }
 
         updateValues.project = project;
         const updatedIssue = await transactions.updateIssue(updateValues);
-        res.json({ result: updatedIssue, _id: _id });
+        return res.json(updatedIssue);
 
       } catch (err) {
         console.log(err)
-        res.status(403).json({ result: 'could not update', _id: _id });
+        return res.status(403).json({ error: 'could not update', _id: _id });
       }
       
     })
@@ -98,16 +116,16 @@ module.exports = function (app) {
         // let project = req.params.project;
         const _id = req.body._id;
 
-        if (_id === '') {
-          return res.json('_id field cannot be empty');
+        if (_id === '' || !_id) {
+          return res.json({ error: 'missing _id' });
         }
 
         const deletedIssue = await transactions.deleteIssue(_id);
-        res.json({ result: deletedIssue, _id: _id });
+        return res.json(deletedIssue);
 
       } catch (err) {
         console.error(err);
-        return res.json({ result: 'could not delete', _id: _id });
+        return res.json({ error: 'could not delete', _id: _id });
       }
       
     });
