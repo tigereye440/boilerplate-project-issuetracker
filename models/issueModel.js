@@ -28,24 +28,26 @@ transactions.findIssues = async (query) => {
 };
 
 transactions.updateIssue = async (query) => {
+    const _id = query._id;
     try {
-        const _id = query._id;
         const issueExist = await issues.findById(_id);
         if (issueExist === null) {
-            return 'could not update'
+            return { error: 'could not update', _id:_id }
         } 
+
+        query.updated_on = Date.now();
         
         const updatedIssue = await issues.findByIdAndUpdate(_id, query);
 
         if (updatedIssue === null) {
-            return 'could not update'
+            return { error: 'could not update', _id: _id }
         }
 
-        return 'updated successfully';
+        return { result: 'successfully updated', _id: _id };
 
     } catch (err) {
         console.log(err);
-        return 'could not update'
+        return { error: 'could not update', _id: _id };
     }
     
 }
@@ -80,19 +82,19 @@ transactions.deleteIssue = async (_id) =>  {
         const issueExists = await issues.findById(_id);
 
         if (issueExists === null) {
-            return 'could not delete'
+            return { error: 'could not delete', _id: _id }
         }
 
 
         const deletedIssue = await issues.findByIdAndDelete(_id);
         if (deletedIssue === null) {
-            return 'could not delete issue'
+            return { error: 'could not delete issue', _id: _id }
         }
 
-        return 'successfully deleted'
+        return { result: 'successfully deleted', _id: _id }
     } catch (err) {
         console.log(err);
-        return 'could not delete'
+        return { error: 'could not delete', _id: _id }
     }
 }
 
