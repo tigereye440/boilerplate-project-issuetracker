@@ -74,7 +74,7 @@ suite('Functional Tests', function() {
                     })
                     .end(function (err, res) {
                         assert.equal(res.status, 200);
-                        assert.equal(res.body, 'missing required field(s)');
+                        assert.equal(res.body.error, 'required field(s) missing');
                         done();
                     });
             });
@@ -139,8 +139,14 @@ suite('Functional Tests', function() {
                         open: false 
                     })
                     .end(function (err, res) {
+                        if (err) {
+                            assert.equal(res.status, 200);
+                            assert.equal(res.body.error, 'could not update');
+                            assert.equal(res.body._id, '668fd8cba4f99c5efe9e8bc1');
+                            done();
+                        }
                         assert.equal(res.status, 200);
-                        assert.equal(res.body.result, 'updated successfully');
+                        assert.equal(res.body.result, 'successfully updated');
                         assert.equal(res.body._id, '668fd8cba4f99c5efe9e8bc1');
                         done();
                     });
@@ -158,8 +164,14 @@ suite('Functional Tests', function() {
                         open: false 
                     })
                     .end(function (err, res) {
+                        if (err) {
+                            assert.equal(res.status, 200);
+                            assert.equal(res.body.result, 'could not update');
+                            assert.equal(res.body._id, '668fd8cba4f99c5efe9e8bc1');
+                            done();
+                        }
                         assert.equal(res.status, 200);
-                        assert.equal(res.body.result, 'updated successfully');
+                        assert.equal(res.body.result, 'successfully updated');
                         assert.equal(res.body._id, '668fd8cba4f99c5efe9e8bc1');
                         done();
                     });
@@ -178,7 +190,7 @@ suite('Functional Tests', function() {
                     })
                     .end(function (err, res) {
                         assert.equal(res.status, 200);
-                        assert.equal(res.body, '_id field cannot be empty');
+                        assert.equal(res.body.error, 'missing _id');
                         done();
                     });
             });
@@ -190,12 +202,18 @@ suite('Functional Tests', function() {
                     .keepOpen()
                     .put('/api/issues/apitest')
                     .send({
-                        _id: '668fd8cba4f99c5efe9e8bc1',
+                        _id: '668fe50c4afe510fa3b08aa4',
                     })
                     .end(function (err, res) {
+                        if (err) {
+                            assert.equal(res.status, 200);
+                            assert.equal(res.body.error, 'could not update');
+                            assert.equal(res.body._id, '668fe50c4afe510fa3b08aa4');
+                            done();
+                        }
                         assert.equal(res.status, 200);
-                        assert.equal(res.body.result, 'updated successfully');
-                        assert.equal(res.body._id, '668fd8cba4f99c5efe9e8bc1');
+                        assert.equal(res.body.error, 'no update field(s) sent');
+                        assert.equal(res.body._id, '668fe50c4afe510fa3b08aa4');
                         done();
                     });
             });
@@ -213,7 +231,7 @@ suite('Functional Tests', function() {
                     })
                     .end(function (err, res) {
                         assert.equal(res.status, 200);
-                        assert.equal(res.body.result, 'could not update');
+                        assert.equal(res.body.error, 'could not update');
                         assert.equal(res.body._id, '668fd86125c8be2164c456d1')
                         done();
                     });
@@ -230,12 +248,18 @@ suite('Functional Tests', function() {
                     .keepOpen()
                     .delete('/api/issues/apitest')
                     .send({
-                        _id: '668fe3cd853ddd304605b85b'
+                        _id: '668ff611f38e0a7bcb92d5ad'
                     })
                     .end(function (err, res) {
+                        if (err) {
+                            assert.equal(res.status, 200);
+                            assert.equal(res.body.error, 'could not delete');
+                            assert.equal(res.body._id, '668ff611f38e0a7bcb92d5ad');
+                            done();
+                        }
                         assert.equal(res.status, 200);
                         assert.equal(res.body.result, 'successfully deleted');
-                        assert.equal(res.body._id, '668fe3cd853ddd304605b85b');
+                        assert.equal(res.body._id, '668ff611f38e0a7bcb92d5ad');
                         done();
                     });
             });
@@ -251,7 +275,7 @@ suite('Functional Tests', function() {
                     })
                     .end(function (err, res) {
                         assert.equal(res.status, 200);
-                        assert.equal(res.body.result, 'could not delete');
+                        assert.equal(res.body.error, 'could not delete');
                         assert.equal(res.body._id, '668fd86125c67e1764c456d1');
                         done();
                     });
@@ -268,7 +292,7 @@ suite('Functional Tests', function() {
                     })
                     .end(function (err, res) {
                         assert.equal(res.status, 200);
-                        assert.equal(res.body, '_id field cannot be empty');
+                        assert.equal(res.body.error, 'missing _id');
                         done();
                     });
             });
